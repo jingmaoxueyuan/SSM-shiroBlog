@@ -6,3 +6,5 @@
 > ###### eclipse-jee-oxygen-3-win32-x86_64
 > ###### JetBrains WebStorm 2018.1.5 x64
 > ###### mysql-8.0.11-winx64
+> ###### apache-tomcat-7.0.88
+> ###### nginx-1.14.0
