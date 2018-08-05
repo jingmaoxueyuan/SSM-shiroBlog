@@ -1,0 +1,62 @@
+<meta charset="UTF-8">
+<div id="news_content">
+</div>
+<a href="" id="lasePage">上一页</a>
+<a href="" id="nextPage">下一页</a>
+<script>
+    page=1;
+    $('#lasePage').click(function () {
+        if(page>=0) {
+            $.ajax({
+                type: "GET",
+                url: serviceURL + "/api/dividePage.do?page=" + --page + "",
+                dataType: "json",
+                contentType: "application/json;charset=utf-8",
+                xhrFields: {
+                    withCredentials: true
+                },success:function (data) {
+                    $('#news_content').empty();
+                    var json=eval(data)
+                    $.each(json.rows,function (i,item) {
+                        var label_news=$('#news_content');
+                        var content_news="<h1><label>"+item.title+"</label></h1>发布人:<label>"+item.userName+"</label><p>"+item.something+"</p><a class='btn btn-link ' onclick='blogEssay("+item.blogId+")'>  Read more »</a>";
+                        label_news.append(content_news);
+                    });
+
+                }
+            });
+
+
+        }else{
+
+
+        }
+        return false;
+    });
+$('#nextPage').click(function () {
+    $.ajax({
+        type: "GET",
+        url: serviceURL + "/api/dividePage.do?page=" + ++page + "",
+        dataType: "json",
+        contentType: "application/json;charset=utf-8",
+        xhrFields: {
+            withCredentials: true
+        },success:function (values) {
+            $('#news_content').empty();
+            var json=eval(values)
+            $.each(json.rows,function (i,item) {
+                var label_news=$('#news_content');
+                var content_news="<h1><label>"+item.title+"</label></h1>发布人:<label>"+item.userName+"</label><p>"+item.something+"</p><a class='btn btn-link ' onclick='blogEssay("+item.blogId+")'>  Read more »</a>";
+                label_news.append(content_news);
+            });
+            if(json.page===205){
+
+                window.location.href="./index.html";
+            }
+        }
+    });
+    return false;
+
+});
+
+</script>

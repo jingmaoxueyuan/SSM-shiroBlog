@@ -1,0 +1,111 @@
+<meta charset="UTF-8">
+
+<link href="../css/bootstrap-fileinput.css" rel="stylesheet">
+<script src="../js/publicAdmin.js"></script>
+<style type="text/css">
+    #inputUser {
+        border-top-right-radius: 15px;
+        border-top-left-radius: 15px;
+        border-bottom-right-radius: 15px;
+        border-bottom-left-radius: 15px;
+    }
+
+     body{
+         color: black;
+     }
+
+
+</style>
+<div class="demo">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 ">
+                <label>登录名:</label>
+                <input type="text" value="231231" readonly="readonly" id="inputUser"
+                       style="height:20px;line-hight:20px; text-align: center">
+            </div>
+
+            <div class="page-header ">
+                <form id="uploadFile" enctype="multipart/form-data" >
+                    <div class="form-group" id="uploadForm">
+                        <div class="fileinput fileinput-new" data-provides="fileinput" id="exampleInputUpload">
+                            <label>上传图片:</label>
+                            <div class="fileinput-new thumbnail" style="width: 200px;height: auto;max-height:150px;">
+                                <img id='picImg' style="width: 150px;height: 150px;max-height: 140px;"
+                                     src="images/noimage.png" alt=""/>
+                            </div>
+                            <div class="fileinput-preview fileinput-exists thumbnail"
+                                 style="max-width: 200px; max-height: 150px;"></div>
+                            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                <span class="btn btn-primary btn-file">
+                            <span class="fileinput-new">选择文件</span>
+                            <span class="fileinput-exists">换一张</span>
+                            <input type="file" name="file" accept="jpg" />
+
+                        </span>
+                                <a href="javascript:;" class="btn btn-warning fileinput-exists"
+                                   data-dismiss="fileinput">移除</a>
+                                <button type="button" id="uploadSubmit" class="btn btn-info">提交</button>
+                                <br>
+                                <p>上传路径为：</p>
+                                <p id="pic"></p>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-12">
+                <label>昵称名:</label>
+                <input type="text" id="inputName"
+                       style="height:20px;line-hight:20px; text-align: center">
+            </div>
+            <div class="col-md-12 ">
+                <label>&nbsp;&nbsp;&nbsp;备注:</label>
+                <input type="text" id="inputAutograph"
+                       style="height:20px;line-hight:20px;  text-align: center">
+            </div>
+            <div class="col-md-12">
+                <input class="btn btn-success" id="userInfoSubmit" type="button" value="提交">
+            </div>
+        </div>
+    </div>
+
+</div>
+</div>
+</div>
+<script src="../js/jquery.min.js"></script>
+<script src="../js/bootstrap-fileinput.js"></script>
+<script>
+    $('#uploadSubmit').click(function () {
+        $.ajax({
+            type: "POST",
+            url: serviceURL + "/admin/updatePic.do",
+            data: new FormData($('#uploadFile')[0]),
+            cache: false,//上传文件无需缓存
+            processData: false,//用于对data参数进行序列化处理 这里必须false
+            contentType: false, //必须
+            xhrFields: {
+                withCredentials: true
+            }, success: uploadPic
+
+        });
+    });
+    $('#userInfoSubmit').click(function () {
+        $.ajax({
+            type: "POST",
+            url: serviceURL + "/admin/updateUserInfo.do",
+            contentType: "application/json;charset=utf-8",
+            dataType: "json",
+            data: JSON.stringify({
+                'userName': $('#inputUser').val(),
+                'pic': $('#pic').text(),
+                'nick': $('#inputName').val(),
+                'remarks': $('#inputAutograph').val()
+            }),
+            xhrFields: {
+                withCredentials: true
+            },success:userInfoSubmit
+        });
+    });
+
+</script>

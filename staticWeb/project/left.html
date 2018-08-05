@@ -1,0 +1,41 @@
+<meta charset="UTF-8">
+<script src="./js/publicAdmin.js"></script>
+<script src="./js/public.js"></script>
+<script type="text/javascript">
+
+    var date = new Date();
+    var dateString = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+    $(document).ready(function () {
+        $('#endtime').attr("value", dateString);
+    });
+
+</script>
+<ul class="nav nav-pills nav-stacked">
+    <!--<li><img src="image/2.jpg" width="200" height="200  "></li>-->
+    <li>
+        <h2><p id="name_info">我就写个名字</p></h2>
+    <li>
+        <h3><p id="name_info1">那你很棒棒哦</p></h3>
+
+    </li>
+    <li>
+        <div id="calendar" class="calendar"></div>
+    </li>
+    <li><a id="adminLogin">后台管理</a></li>
+</ul>
+<script src="http://www.jq22.com/jquery/jquery-1.10.2.js"></script>
+<script src="js/calendar.js"></script>
+<script>
+    $('#adminLogin').click(function () {
+
+        $.ajax({
+            type:"POST",
+            url:serviceURL+"/admin/adminLoginProving.do",
+            contentType:"application/json;charset=utf-8",
+            dataType:"json",
+            xhrFields:{
+                withCredentials:true
+            },success:getProbing
+        });
+    });
+</script>

@@ -1,0 +1,32 @@
+<meta charset="UTF-8">
+<script>
+    $(document).ready(function () {
+        load();
+        $.ajax({
+            type: "POST",
+            url: serviceURL + "/api/doGetData.do",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            xhrFields: {
+                withCredentials: true
+            }, success: doGetData
+        });
+    });
+
+    function load() {
+        $('#header').load('./header.html');
+
+    }
+</script>
+<nav class="navbar navbar-inverse" role="navigation">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="/project/index.html">首页</a>
+            <a class="navbar-brand" href="https://github.com">github</a>
+            <a class="navbar-brand" href="https://blog.csdn.net">csdn</a>
+            <a class="navbar-brand" href="https://www.twitch.tv">twitch</a>
+            <div id="header"></div>
+        </div>
+
+    </div>
+</nav>

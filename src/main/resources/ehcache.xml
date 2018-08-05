@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="http://ehcache.org/ehcache.xsd"
+         updateCheck="false" maxBytesLocalHeap="200M">
+
+    <diskStore path="java.io.tmpdir"/>
+
+    <!--前台用户登录过期设置-->
+    <defaultCache
+            eternal="false"
+            timeToIdleSeconds="600"
+            timeToLiveSeconds="600"
+            overflowToDisk="true"
+            maxElementsOnDisk="1000"
+            diskPersistent="false"
+            diskExpiryThreadIntervalSeconds="120"
+            memoryStoreEvictionPolicy="LRU"
+            />
+       <cache name="tBaseNo"
+           eternal="false"
+           overflowToDisk="false"
+           diskPersistent="false"
+           timeToIdleSeconds="600"
+           statistics="true"
+           timeToLiveSeconds="600"/>
+        <cache name="tSysMenu"
+           eternal="false"
+           overflowToDisk="false"
+           diskPersistent="false"
+           timeToIdleSeconds="600"
+           statistics="true"
+           timeToLiveSeconds="600"/>
+         
+</ehcache>

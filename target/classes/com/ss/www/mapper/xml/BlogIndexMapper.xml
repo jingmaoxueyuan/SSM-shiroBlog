@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ss.www.mapper.BlogIndexMapper">
+	<resultMap type="com.ss.www.entity.EssayResultMap"
+		id="essayResultMap">
+		<id column="blogId" property="blogId" jdbcType="INTEGER" />
+		<result column="username" property="userName"
+			jdbcType="VARCHAR" />
+		<result column="label" property="label" jdbcType="VARCHAR" />
+		<result column="something" property="something"
+			jdbcType="VARCHAR" />
+		<result column="title" property="title" jdbcType="VARCHAR" />
+		<result column="content" property="content" jdbcType="VARCHAR" />
+		<result column="status" property="status" jdbcType="VARCHAR" />
+		<result column="create_date" property="create_Date"
+			jdbcType="VARCHAR" />
+		<result column="comment" property="comment" jdbcType="VARCHAR" />
+	</resultMap>
+	<resultMap type="com.ss.www.entity.CommentResultMap"
+		id="commentResultMap">
+		<id column="blog_Id" property="blog_Id" jdbcType="INTEGER" />
+		<result column="create_date" property="create_Date"
+			jdbcType="VARCHAR" />
+		<result column="comment" property="comment" jdbcType="VARCHAR" />
+		<result column="username" property="userName"
+			jdbcType="VARCHAR" />
+	</resultMap>
+	<select id="findUserInfoByIndex" resultType="User">
+		SELECT nick,remarks
+		from user where username='admin'
+	</select>
+	<select id="findLabelInfoByIndex" resultType="Label">
+		select * from
+		label
+	</select>
+	<select id="findBlogInfoByIndex" resultMap="essayResultMap">
+		SELECT
+		a.blogid,a.title,b.username,a.something FROM blog a INNER JOIN user b
+		ON a.user_id=b.user_id WHERE a.status='已发布'
+		ORDER BY a.blogid DESC
+		LIMIT 4
+	</select>
+	<select id="findBlogCountByIndex" resultType="int">
+		SELECT COUNT(*)
+		FROM blog
+	</select>
+	<select id="findNextPages" parameterType="pages"
+		resultMap="essayResultMap">
+		SELECT
+		a.blogid,a.title,b.username,a.something FROM blog a
+		INNER JOIN user b
+		ON a.user_id=b.user_id WHERE a.status='已发布'
+		ORDER BY
+		a.blogid DESC
+		LIMIT #{pages},#{limit}
+	</select>
+	<select id="findBlogInfo" parameterType="int"
+		resultMap="essayResultMap">
+		SELECT
+		a.blogid,b.username,c.label,a.something,a.content,a.create_date
+		,a.title FROM blog a INNER JOIN user b ON a.user_id=b.user_id INNER
+		JOIN label c
+		ON a.label_id=c.label_id WHERE a.blogid=#{blog_Id}
+	</select>
+	<select id="findCommentInfo" parameterType="int"
+		resultMap="commentResultMap">
+		SELECT b.blogid,c.comment,c.create_Date,d.username FROM
+		comment_blog a INNER
+		JOIN blog b ON a.Blog_Id=b.blogid INNER JOIN
+		comment c ON a.comment_Id=c.comment_Id left JOIN user d ON
+		a.user_Id=d.user_id
+		where b.blogid=#{blogId}
+	</select>
+	<select id="findLabelInfo" parameterType="int" resultMap="essayResultMap">
+	SELECT
+		a.blogid,b.username,c.label,a.something,a.content,a.create_date
+		,a.title FROM blog a INNER JOIN user b ON a.user_id=b.user_id INNER
+		JOIN label c
+		ON a.label_id=c.label_id WHERE c.label_id=#{label_id} AND a.status='已发布'
+	</select>
+</mapper>

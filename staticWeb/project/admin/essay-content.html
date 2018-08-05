@@ -1,0 +1,248 @@
+<meta charset="UTF-8">
+
+<script src="../js/jquery.min.js"></script>
+<script src="../js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="../css/bootstrap-table.css">
+<script src="../js/MsgBox.js"></script>
+
+<style>
+    body {
+        color: black;
+    }
+
+    #choiceWindow {
+        display: none;
+        position: absolute;
+        top: 25%;
+        left: 25%;
+        width: 50%;
+        height: 55%;
+        padding: 20px;
+        border: 3px solid #ccc;
+        background-color: white;
+        z-index: 2;
+        overflow: auto;
+    }
+
+
+</style>
+
+<div class="demo">
+    <div class="container">
+        <div class="row">
+
+            <div class="col-sm-5" id="so">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="searchInput"/>
+                    <span class="input-group-addon"><a href="#"><i
+                            class="glyphicon glyphicon-search" id="search"> <span>搜索   </span></i></a></span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="../js/bootstrap-table.js"></script>
+<!--汉化文件，放在 bootstrap-table.js 后面-->
+<script src="../js/bootstrap-table-zh-CN.js"></script>
+
+<div id="choiceWindow">
+    <label id="x" style="position: absolute;top:2px;left: 95%;font-size: 25px;">x</label>
+    <form>
+        <label>发布人：</label>
+        <p>xx</p>
+        <label>标题：</label>
+        <p>xx</p>
+        <label>分类：</label>
+        <p>xx</p>
+        <label>状态：</label>
+        <p>xx</p>
+
+    </form>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-body">
+        <button class="btn btn-default" id="news_add11"> 新增</button>
+        <a class="btn btn-default" id="news_edit"> 修改</a>
+        <a class="btn btn-default" id="news_del"> 删除</a>
+        <a class="btn btn-default" id="news_view"> 查看</a>
+        <a class="btn btn-default" id="news_status"> 发布</a>
+        <p>查看功能暂时不写，感觉没必要</p>
+        <table id="table_server"></table>
+    </div>
+</div>
+
+<script>
+    function table(obj){
+        $("#table_server").bootstrapTable({
+            data: obj,
+            striped: true,//设置为 true 会有隔行变色效果
+            undefinedText: "空",//当数据为 undefined 时显示的字符
+            pagination: true, //分页
+            sidePagination: "service", //使用什么分页方式
+            pageNumber: 1,//从第几页开始显示
+            pageSize: 5, //每页显示几行
+            pageList: [5, 10, ], //选择每页显示多少行
+            async:true,
+            showColumns: false,                  //是否显示所有的列（选择显示的列）
+            showRefresh: false,                  //是否显示刷新按钮
+            minimumCountColumns: 2,             //最少允许的列数
+            clickToSelect: true,                //是否启用点击选中行
+            paginationPreText: '‹',//指定分页条中上一页按钮的图标或文字,这里是<
+            paginationNextText: '›',//指定分页条中下一页按钮的图标或文字,这里是>
+            singleSelect: true,   //设置禁止多选
+            idField: "blogId",//指定主键列
+            columns: [{
+                checkbox: true,
+
+            },
+                {
+                    title: 'ID',//表的列名
+                    field: 'blogId',//json数据中rows数组中的属性名
+                    align: 'center',//水平居中,
+                    formatter: function (value,
+                                         row, index) {
+                        return index + 1;
+                    }
+                },
+                {
+                    title: '发布人',//表的列名
+                    field: 'userName',//json数据中rows数组中的属性名
+                    align: 'center'//水平居中,
+                }, {
+                    title: '标题',//表的列名
+                    field: 'title',//json数据中rows数组中的属性名
+                    align: 'center'//水平居中,
+                },
+                {
+                    title: '分类',//表的列名
+                    field: 'label',//json数据中rows数组中的属性名
+                    align: 'center'//水平居中,
+                },
+                {
+                    title: '描述',//表的列名
+                    field: 'something',//json数据中rows数组中的属性名
+                    align: 'center'//水平居中,
+                },
+                {
+                    title: '状态',//表的列名
+                    field: 'status',//json数据中rows数组中的属性名
+                    align: 'center'//水平居中,
+                },
+                {
+                    title: '创建日期',//表的列名
+                    field: 'create_Date',//json数据中rows数组中的属性名
+                    align: 'center'//水平居中,
+                }
+            ],
+            onCheck: function (row) {
+                rows = row;
+
+            },onUncheck:function(row){
+                rows=null;
+            }
+        });
+    }
+    $(document).ready(function () {
+        rows=null;
+        $.ajax({
+            url: serviceURL + "/admin/essayView.do",
+            type: "GET",
+            dataType: "json",
+            contentType: "application/json;charset=utf-8",
+            xhrFields: {
+                withCredentials: true
+            },
+            success: function (value) {
+                var obj = [];
+                $.each(value.rows, function (i, d) {
+                    obj.push(d);
+                });
+
+                table(obj);
+            },
+            error: function () {
+
+            }
+        });
+    });
+
+    $('#news_status').click(function () {
+        if(rows!=null){
+            $.ajax({
+                type: "POST",
+                url: serviceURL + "/admin/statusChange.do",
+                data: JSON.stringify({blogId: rows.blogId}),
+                dataType: "json",
+                contentType: "application/json;charset=utf-8",
+                xhrFields: {
+                    withCredentials: true
+                }, success: statuschange
+            });
+        }else{
+            alert('请选择');
+        }
+    });
+
+    function new_delete() {
+
+        $.ajax({
+            type: "POST",
+            url: serviceURL + "/admin/essayDelete.do",
+            data: JSON.stringify({blogId: rows.blogId}),
+            dataType: "json",
+            contentType: "application/json;charset=utf-8",
+            xhrFields: {
+                withCredentials: true
+            }, success: deleteStatus
+        });
+    }
+
+    $("#news_del").bind("click", function () {
+        if (rows != null) {
+            $.MsgBox.Confirm("温馨提示", "确定要进行删除吗？", new_delete);
+        }else{
+            alert('请选择');
+        }
+    });
+    $('#news_add11').click(function () {
+        $('#content').load('./UEditor.html');
+    });
+    $('#news_view').click(function () {
+        $("#choiceWindow").slideDown(500);
+        $("#backGround").show();
+    });
+    $('#news_edit').click(function () {
+       if(rows!=null){
+           $('#content').load('./updata-content.html');
+       }else{
+           alert('请选择');
+       }
+    });
+    $('#x').click(function () {
+        $("#choiceWindow").hide();
+    });
+
+    //*****************************************************************************************************************/
+$('#search').click(function () {
+    $.ajax({
+        url: serviceURL + "/admin/searchEssay.do",
+        type: "POST",
+        data:JSON.stringify({title:$('#searchInput').val()}),
+        dataType: "json",
+        contentType: "application/json;charset=utf-8",
+        xhrFields: {
+            withCredentials: true
+        },success:function (data) {
+            $("#table_server").bootstrapTable('destroy');
+            var obj = [];
+            $.each(data.rows, function (i, d) {
+                obj.push(d);
+            });
+            table(obj);
+        }
+     });
+});
+</script>

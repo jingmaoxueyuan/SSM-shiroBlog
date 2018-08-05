@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<meta charset="UTF-8">
+
+<script src="../js/jquery.min.js"></script>
+<script src="../js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="../css/bootstrap-table.css">
+<script src="../js/MsgBox.js"></script>
+
+<style>
+    body {
+        color: black;
+    }
+
+    #choiceWindow {
+        display: none;
+        position: absolute;
+        top: 25%;
+        left: 25%;
+        width: 50%;
+        height: 55%;
+        padding: 20px;
+        border: 3px solid #ccc;
+        background-color: white;
+        z-index: 2;
+        overflow: auto;
+    }
+
+    #labelWindow {
+        display: none;
+        position: absolute;
+        top: 25%;
+        left: 25%;
+        width: 50%;
+        height: 55%;
+        padding: 20px;
+        border: 3px solid #ccc;
+        background-color: white;
+        z-index: 2;
+        overflow: auto;
+    }
+
+
+</style>
+
+<script src="../js/bootstrap-table.js"></script>
+<!--汉化文件，放在 bootstrap-table.js 后面-->
+<script src="../js/bootstrap-table-zh-CN.js"></script>
+
+<div id="choiceWindow">
+    <label id="x" style="position: absolute;top:2px;left: 95%;font-size: 25px;">x</label>
+    <form>
+        <label>分类标题:</label><br>
+        <input type="text" id="insertLabelText"><br><br><br><br><br><br>
+        <button type="button" id="insertLabelsubmit">提交</button>
+    </form>
+</div>
+<div id="labelWindow">
+    <label id="close" style="position: absolute;top:2px;left: 95%;font-size: 25px;">x</label>
+    <form>
+        <label>分类标题:</label><br>
+        <input type="text" id="updateLabelText"><br>
+        <label>创建日期:</label><br>
+        <input type="text" id="updateLabelDate"readonly="readonly"><br><br><br><br>
+        <button type="button" id="updateLabelsubmit">修改</button>
+    </form>
+</div>
+
+<div class="demo">
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <button class="btn btn-default" id="labels_add11"> 新增</button>
+            <a class="btn btn-default" id="labels_edit"> 修改</a>
+            <a class="btn btn-default" id="labels_del"> 删除</a>
+            <a class="btn btn-default" id="labels_view"> 查看</a>
+            <p>查看功能暂时不写，感觉没必要</p>
+            <table id="table_server"></table>
+        </div>
+    </div>
+</div>
+
+<body>
+<script>
+    $(document).ready(function () {
+        rows=null;
+        $.ajax({
+            url: serviceURL + "/admin/findLabelTable.do",
+            type: "GET",
+            dataType: "json",
+            contentType: "application/json;charset=utf-8",
+            xhrFields: {
+                withCredentials: true
+            },
+            success: function (value) {
+                var obj = [];
+                $.each(value.rows, function (i, d) {
+                    obj.push(d);
+                });
+                $("#table_server").bootstrapTable({
+                    data: obj,
+                    striped: true,//设置为 true 会有隔行变色效果
+                    undefinedText: "空",//当数据为 undefined 时显示的字符
+                    pagination: true, //分页
+                    sidePagination: "service", //使用什么分页方式
+                    pageNumber: 1,//从第几页开始显示
+                    pageSize: 5, //每页显示几行
+                    pageList: [5, 10,], //选择每页显示多少行
+                    sortOrder: 'asc',
+                    showColumns: false,                  //是否显示所有的列（选择显示的列）
+                    showRefresh: false,                  //是否显示刷新按钮
+                    minimumCountColumns: 2,             //最少允许的列数
+                    clickToSelect: true,                //是否启用点击选中行
+                    paginationPreText: '‹',//指定分页条中上一页按钮的图标或文字,这里是<
+                    paginationNextText: '›',//指定分页条中下一页按钮的图标或文字,这里是>
+                    singleSelect: true,   //设置禁止多选
+                    idField: "label_Id",//指定主键列
+                    columns: [{
+                        checkbox: true,
+
+                    },
+                        {
+                            title: 'ID',//表的列名
+                            field: 'label_Id',//json数据中rows数组中的属性名
+                            align: 'center',//水平居中,
+                            formatter: function (value,
+                                                 row, index) {
+                                return index + 1;
+                            }
+                        },
+                        {
+                            title: '分类标题',//表的列名
+                            field: 'label',//json数据中rows数组中的属性名
+                            align: 'center'//水平居中,
+                        }, {
+                            title: '创建时间',//表的列名
+                            field: 'create_Date',//json数据中rows数组中的属性名
+                            align: 'center'//水平居中,
+                        }
+                    ],
+                    onCheck: function (row) {
+                        rows = row;
+
+                    },onUncheck:function(row){
+                        rows=null;
+                    }
+                });
+
+            },
+            error: function () {
+
+            }
+        });
+    });
+    $('#labels_add11').click(function () {
+        $("#choiceWindow").slideDown(500);
+        $("#backGround").show();
+    });
+    $('#x').click(function () {
+        $("#choiceWindow").hide();
+    });
+    $('#close').click(function () {
+        $("#labelWindow").hide();
+    });
+    $('#insertLabelsubmit').click(function () {
+        $.ajax({
+            type: "POST",
+            url: serviceURL + "/admin/insertLabel.do",
+            data: JSON.stringify({label: $('#insertLabelText').val()}),
+            dataType: "json",
+            contentType: "application/json;charset=utf-8",
+            xhrFields: {
+                withCredentials: true
+            }, success: successInsertLabel
+        });
+    });
+    $('#labels_edit').click(function () {
+        if (rows != null) {
+            $.ajax({
+                type: "GET",
+                url: serviceURL + "/admin/findUpdataLabel.do?label_Id=" + rows.label_Id + "",
+                dataType: "json",
+                contentType: "application/json;charset=utf-8",
+                xhrFields: {
+                    withCredentials: true
+                }, success: successupdateLabel
+            });
+        } else {
+            alert('请选择');
+        }
+    });
+    $('#updateLabelsubmit').click(function () {
+        if(rows!=null){
+            $.ajax({
+                type:"POST",
+                url:serviceURL+"/admin/updateLabel.do",
+                data:JSON.stringify({label_Id:rows.label_Id,label:$('#updateLabelText').val()}),
+                dataType:"json",
+                contentType:"application/json;charset=utf-8",
+                xhrFields:{
+                    withCredentials:true
+                },success:successUpdata
+            });
+        }else{
+            alert('请选择');
+        }
+    });
+    function label_Delete(){
+        $.ajax({
+            type: "POST",
+            url: serviceURL + "/admin/deleteLabel.do",
+            data: JSON.stringify({label_Id: rows.label_Id}),
+            dataType: "json",
+            contentType: "application/json;charset=utf-8",
+            xhrFields: {
+                withCredentials: true
+            },success:sucessDelete
+        });
+    }
+    $('#labels_del').click(function () {
+        if (rows != null) {
+            $.MsgBox.Confirm("温馨提示", "确定要进行删除吗？",label_Delete);
+        }else{
+            alert('请选择');
+        }
+    });
+</script>
+</body>
+</html>

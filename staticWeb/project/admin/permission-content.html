@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<meta charset="UTF-8">
+
+<script src="../js/jquery.min.js"></script>
+<script src="../js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="../css/bootstrap-table.css">
+<script src="../js/MsgBox.js"></script>
+
+<style>
+    body {
+        color: black;
+    }
+
+    #choiceWindow {
+        display: none;
+        position: absolute;
+        top: 25%;
+        left: 25%;
+        width: 50%;
+        height: 55%;
+        padding: 20px;
+        border: 3px solid #ccc;
+        background-color: white;
+        z-index: 2;
+        overflow: auto;
+    }
+
+    #updateWindow {
+        display: none;
+        position: absolute;
+        top: 25%;
+        left: 25%;
+        width: 50%;
+        height: 55%;
+        padding: 20px;
+        border: 3px solid #ccc;
+        background-color: white;
+        z-index: 2;
+        overflow: auto;
+    }
+
+    #permissionWindow {
+        display: none;
+        position: absolute;
+        top: 25%;
+        left: 25%;
+        width: 50%;
+        height: 50%;
+        padding: 20px;
+        border: 3px solid #ccc;
+        background-color: white;
+        z-index: 2;
+        overflow: auto;
+    }
+</style>
+
+<script src="../js/bootstrap-table.js"></script>
+<!--汉化文件，放在 bootstrap-table.js 后面-->
+<script src="../js/bootstrap-table-zh-CN.js"></script>
+
+<div id="choiceWindow">
+    <label id="permissionAddClose" style="position: absolute;top:2px;left: 95%;font-size: 25px;">x</label>
+    <form>
+
+        <label>角色:</label><br>
+        <input type="text" id="insert_role"></input>
+        <br><br><br><br>
+        <button type="button" id="insertPermissionsSubmit">提交</button>
+    </form>
+</div>
+
+<div id="permissionWindow">
+    <label id="permissionClose" style="position: absolute;top:2px;left: 95%;font-size: 25px;">x</label>
+    <form>
+
+        <div id="permission_load"></div>
+
+        <button type="button" id="permissionsSubmit">提交</button>
+    </form>
+</div>
+<div id="updateWindow">
+    <label id="permissionUpdateClose" style="position: absolute;top:2px;left: 95%;font-size: 25px;">x</label>
+    <form>
+
+        <label>角色:</label><br>
+        <input type="text" id="update_role"></input>
+        <br><br><br><br>
+        <button type="button" id="updatePermissionsSubmit">提交</button>
+    </form>
+</div>
+<div class="demo">
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <a class="btn btn-default" id="permission_add"> 新增</a>
+            <a class="btn btn-default" id="permission_edit">修改</a>
+            <a class="btn btn-default" id="permission_del"> 删除</a>
+            <a class="btn btn-default" id="permission_view"> 查看</a>
+            <a class="btn btn-default" id="permission_role">分配权限</a>
+            <p>查看功能暂时不写，感觉没必要</p>
+            <table id="table_server"></table>
+        </div>
+    </div>
+</div>
+
+<body>
+<script>
+    $(document).ready(function () {
+        rows = null;
+        $.ajax({
+            url: serviceURL + "/admin/findPermissionTable.do",
+            type: "GET",
+            dataType: "json",
+            contentType: "application/json;charset=utf-8",
+            xhrFields: {
+                withCredentials: true
+            },
+            success: function (value) {
+                var obj = [];
+                $.each(value.rows, function (i, d) {
+                    obj.push(d);
+                });
+                $("#table_server").bootstrapTable({
+                    data: obj,
+                    striped: true,//设置为 true 会有隔行变色效果
+                    undefinedText: "空",//当数据为 undefined 时显示的字符
+                    pagination: true, //分页
+                    sidePagination: "service", //使用什么分页方式
+                    pageNumber: 1,//从第几页开始显示
+                    pageSize: 5, //每页显示几行
+                    pageList: [5, 10,], //选择每页显示多少行
+                    async: true,
+                    showColumns: false,                  //是否显示所有的列（选择显示的列）
+                    showRefresh: false,                  //是否显示刷新按钮
+                    minimumCountColumns: 0,             //最少允许的列数
+                    clickToSelect: true,                //是否启用点击选中行
+                    paginationPreText: '‹',//指定分页条中上一页按钮的图标或文字,这里是<
+                    paginationNextText: '›',//指定分页条中下一页按钮的图标或文字,这里是>
+                    singleSelect: true,   //设置禁止多选
+                    idField: "role_Id",//指定主键列
+                    columns: [{
+                        checkbox: true,
+
+                    },
+                        {
+                            title: 'ID',//表的列名
+                            field: 'role_Id',//json数据中rows数组中的属性名
+                            align: 'center',//水平居中,
+                            formatter: function (value,
+                                                 row, index) {
+                                return index + 1;
+                            }
+                        },
+                        {
+                            title: '角色',//表的列名
+                            field: 'role',//json数据中rows数组中的属性名
+                            align: 'center'//水平居中,
+                        }, {
+                            title: '创建日期',//表的列名
+                            field: 'create_Date',//json数据中rows数组中的属性名
+                            align: 'center'//水平居中,
+                        }
+                    ],
+                    onCheck: function (row) {
+                        rows = row;
+
+                    }, onUncheck: function (row) {
+                        rows = null;
+                    }
+                });
+
+            },
+            error: function () {
+
+            }
+        });
+    });
+    $('#insertPermissionsSubmit').click(function () {
+        $.ajax({
+            type: "POST",
+            url: serviceURL + "/admin/insertPermission.do",
+            data: JSON.stringify({role: $('#insert_role').val()}),
+            dataType: "json",
+            contentType: "application/json;charset=utf-8",
+            xhrFields: {
+                withCredentials: true
+            }, success: successInsertPermission
+
+        });
+    });
+
+    $('#permission_add').click(function () {
+        $("#choiceWindow").slideDown(500);
+        $("#backGround").show();
+    });
+    $('#permissionAddClose').click(function () {
+        $('#choiceWindow').hide();
+    });
+    $('#permission_edit').click(function () {
+        if (rows != null) {
+            $("#updateWindow").slideDown(500);
+            $("#backGround").show();
+            $('#update_role').val(rows.role);
+        } else {
+            alert('请选择');
+        }
+    });
+    $('#permissionUpdateClose').click(function () {
+        $('#updateWindow').hide();
+    });
+    $('#updatePermissionsSubmit').click(function () {
+        $.ajax({
+            type: "POST",
+            url: serviceURL + "/admin/updatePermission.do",
+            data: JSON.stringify({role_Id: rows.role_Id, role: $('#update_role').val()}),
+            dataType: "json",
+            contentType: "application/json;charset=utf-8",
+            xhrFields: {
+                withCredentials: true
+            }, success: successUpdatePermission
+        });
+    });
+
+    function deletePermission() {
+        $.ajax({
+            type: "POST",
+            url: serviceURL + "/admin/deletePermission.do",
+            data: JSON.stringify({role_Id: rows.role_Id}),
+            dataType: "json",
+            contentType: "application/json;charset=utf-8",
+            xhrFields: {
+                withCredentials: true
+            }, success: successDeletePermission
+        });
+    }
+
+    $('#permission_del').click(function () {
+        if (rows != null) {
+            $.MsgBox.Confirm("温馨提示", "确定要进行删除吗？", deletePermission);
+        } else {
+            alert('请选择');
+        }
+    });
+    $('#permission_role').click(function () {
+        if (rows != null) {
+            $("#permissionWindow").slideDown(500);
+            $("#backGround").show();
+            $.ajax({
+                type: "GET",
+                url: serviceURL + "/admin/selectPermission.do",
+                dataType: "json",
+                contentType: "application/json;charset=utf-8",
+                xhrFields: {
+                    withCredentials: true
+                },success:successPermissionSelect
+            });
+        } else {
+            alert('请选择');
+        }
+    });
+    $('#permissionClose').click(function () {
+        $("#permissionWindow").hide();
+    });
+    $('#permissionsSubmit').click(function () {
+        obj = document.getElementsByName("permission_box");
+        check_val = [];
+        for(k in obj){
+            if(obj[k].checked)
+                check_val.push(obj[k].value);
+        }
+        $.ajax({
+           type:"POST",
+           url:serviceURL+"/admin/permissionAllot.do",
+            data:JSON.stringify({role:rows.role,permission:check_val}),
+            dataType:"json",
+            contentType:"application/json;charset=utf-8",
+            xhrFields:{
+               withCredentials:true
+            },success:successPermissionAllot
+        });
+    });
+
+</script>
+</body>
+</html>

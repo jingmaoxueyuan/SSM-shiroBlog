@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <title>title</title>
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/calendar.css">
+    <script src="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="js/calendar.js"></script>
+
+    <script src="js/public.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            load();
+
+        });
+
+        function load() {
+            $('#nav').load('./nav.html');
+            $('#left').load('./left.html');
+            $('#content').load('./index-content.html');
+            $('#left_nav').load('./left_nav.html');
+
+        }
+
+
+    </script>
+    <style type="text/css">
+        body {
+            background-color: darkgray;
+        }
+
+    </style>
+</head>
+<body>
+
+
+<div class="container" id="nav">
+</div>
+<div class="container" id="index">
+    <div class="row">
+        <div class="col-lg-3 pull-right text-right" id="left"></div>
+        <div class="col-lg-3  text-left" id="left_nav"></div>
+        <div class="col-lg-6 pull-right text-center  " id="content"></div>
+    </div>
+</div>
+</body>
+</html>

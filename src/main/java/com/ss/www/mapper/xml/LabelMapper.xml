@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ss.www.mapper.LabelMapper">
+	<select id="findLabel" resultType="Label">
+		select * from label
+	</select>
+	<insert id="insertLabelInfo" parameterType="Label">
+		insert into
+		label(label,create_Date) values(#{label},#{create_Date})
+	</insert>
+	<select id="findUpdateLabel" parameterType="int"
+		resultType="Label">
+		SELECT * from label WHERE label_id=#{label_Id}
+	</select>
+	<update id="updateLabel" parameterType="Label">
+		update label set
+		label=#{label} WHERE label_Id=#{label_Id}
+	</update>
+	<delete id="deleteLabel" parameterType="int">
+	delete from label where label_Id=#{label_Id}
+	</delete>
+</mapper>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ss.www.mapper.EssayMapper">
+	<resultMap type="com.ss.www.entity.EssayResultMap"
+		id="essayResultMap">
+		<id column="blogId" property="blogId" jdbcType="INTEGER" />
+		<result column="username" property="userName"
+			jdbcType="VARCHAR" />
+		<result column="label" property="label" jdbcType="VARCHAR" />
+		<result column="something" property="something"
+			jdbcType="VARCHAR" />
+		<result column="content" property="content" jdbcType="VARCHAR" />
+		<result column="status" property="status" jdbcType="VARCHAR" />
+		<result column="create_date" property="create_Date"
+			jdbcType="VARCHAR" />
+	</resultMap>
+	<select id="findEssayCount" parameterType="String"
+		resultType="int">
+		select count(*) from blog
+	</select>
+	<select id="findEssayByUserName" parameterType="string"
+		resultMap="essayResultMap">
+		SELECT
+		a.blogid,b.username,a.title,c.label,a.something,a.status,a.create_date
+		FROM
+		blog a INNER JOIN user b ON a.user_id=b.user_id INNER JOIN label c
+		ON
+		a.label_id=c.label_id WHERE b.username=#{username}
+	</select>
+	<select id="findEssayStatusByBlogId" parameterType="int"
+		resultType="string">
+		SELECT status FROM blog WHERE blogid=#{blogid}
+	</select>
+	<update id="updateEssayStatus" parameterType="Blog">
+		update blog set
+		status=#{status} where blogid=#{blogId}
+	</update>
+	<delete id="deleteEssayByEssayId" parameterType="int">
+		delete from blog
+		where blogid=#{blogId}
+	</delete>
+	<select id="findLabel" resultType="Label">
+		select * from label
+	</select>
+	<insert id="insertEssay" parameterType="essayResultMap">
+		INSERT INTO
+		blog(user_id,label_id,something,content,title,create_date,status)
+		VALUES
+		((SELECT user_id FROM user where username=#{userName}),
+		(SELECT
+		label_id FROM label where label=#{label}),
+		#{something},#{content},#{title},#{create_Date},'未发布');
+	</insert>
+	<select id="findEssayByBlogId" parameterType="int"
+		resultMap="essayResultMap">
+		SELECT
+		a.blogid,b.username,a.title,c.label,a.something,a.status,a.content
+		FROM
+		blog a INNER JOIN user b ON a.user_id=b.user_id INNER JOIN label c
+		ON
+		a.label_id=c.label_id WHERE a.blogid=#{blogId};
+	</select>
+	<update id="updateEssayByBlogId" parameterType="essayResultMap">
+		UPDATE blog SET
+		title=#{title},label_id=(SELECT label_id from label
+		where
+		label=#{label}),
+		something=#{something},content=#{content} where
+		blogid=#{blogId};
+	</update>
+	<select id="searchTitle" parameterType="string"
+		resultMap="essayResultMap">
+		SELECT
+		a.blogid,b.username,a.title,c.label,a.something,a.status,a.create_date
+		FROM
+		blog a INNER JOIN user b ON a.user_id=b.user_id INNER JOIN label c
+		ON
+		a.label_id=c.label_id WHERE a.title LIKE concat('%',#{title},'%');
+	</select>
+</mapper>

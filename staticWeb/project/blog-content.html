@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/calendar.css">
+    <script src="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="js/calendar.js"></script>
+
+    <script src="js/public.js"></script>
+</head>
+<style>
+    body {
+        background-color: darkgray;
+    }
+
+</style>
+<script>
+    $(document).ready(function () {
+        load();
+
+    });
+    function load() {
+        $('#nav').load('./nav.html');
+        var storage=window.localStorage;
+        var blogInfo=storage.a;
+
+        $.ajax({
+            type:"GET",
+            url:serviceURL+"/api/findBlogInfo.do?blogId="+blogInfo+"",
+            dataType:"json",
+            contentType:"application/json;charset=utf-8",
+            xhrFields:{
+                withCredentials:true
+            },success:function (data) {
+
+                var json=eval(data);
+                var  jsonObject=json.object;
+                 $('#blogTitle').html(jsonObject.title);
+                 $('#left').append(jsonObject.content);
+                 $('#somethingInfo').html("描述:"+jsonObject.something);
+                 $('#labelInfo').html("分类:"+jsonObject.label);
+                 $('#userInfo').html("发布人:"+jsonObject.userName);
+                 $('#create_Date').html("发布日期:"+jsonObject.create_Date);
+                 $.each(json.comment,function (i,item) {
+                     var comment=$('#comment');
+
+                     if(item.userName!=null){
+                         var content="<br><label>"+item.userName+"</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+item.create_Date+"<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label>"+item.comment+"</label><hr>";
+                     }else{
+                         var content="<br><label>游客</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+item.create_Date+"<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label>"+item.comment+"</label><hr>";
+                     }
+                     comment.append(content);
+                 });
+            }
+        });
+    }
+</script>
+<body>
+<div class="container" id="nav">
+</div>
+<div class="container" >
+    <div class="row">
+        <div class="col-lg-12 text-center">
+            <h2><label style="color: black" id="blogTitle">标题</label></h2>
+<hr>
+        </div>
+    </div>
+    <div class="row">
+            <div class="col-lg-10 pull-left " id="left">
+
+        </div>
+        <div class="col-lg-2 pull-right">
+            <br><br>
+            <label  style="color: black" id="somethingInfo">描述:</label><br>
+            <label style="color: black" id="labelInfo">分类:</label><br>
+            <label style="color: black" id="userInfo"> 发布人：admin</label><br>
+            <label style="color: black" id="create_Date">发布时间</label>
+
+        </div>
+    </div>
+    <div class="row">
+    <h3><label>评论区</label></h3>
+        <hr>
+        <div id="comment">
+
+        </div>
+        <input type="text" style="height: 20px;width: 500px"placeholder="请输入评论">
+        <input type="button" value="提交">
+    </div>
+</div>
+</body>
+</html>

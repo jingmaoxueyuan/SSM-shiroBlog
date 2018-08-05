@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="../js/ueditor.config.js"></script>
+    <script type="text/javascript" src="../js/jquery.min.js"></script>
+    <script type="text/javascript" src="../js/ueditor.all.js"></script>
+    <script type="text/javascript" src="../js/zh-cn.js"></script>
+
+    <style>
+        #editor {
+            width: 800px;
+            height: 250px;
+            position: fixed;
+            bottom: 200px;
+        }
+
+        body {
+            color: black;
+        }
+    </style>
+</head>
+
+
+<div class="demo">
+    <div class="container">
+        <div class="row">
+            <div class=" col-md-12 pull-left ">
+                <h5><label>编号:</label>
+                    <input type="text" id="numberId" readonly="readonly"></h5>
+                <h5><label>标题:</label>
+                    <input type="text" id="title">
+                </h5>
+                <h5><label>分类:</label>
+                    <select id="label" class="select">
+                    </select>
+                </h5>
+                <h5><label>描述:</label>
+                    <input type="text" id="something">
+                    <button type="button" id="content_UEditor">提交</button>
+                </h5>
+            </div>
+            <div class="col-md-12">
+                <script id="editor" type="text/plain"></script>
+
+            </div>
+
+        </div>
+
+
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $.ajax({
+            type: "GET",
+            url: serviceURL + "/admin/essayLabel.do",
+            dataType: "json",
+            contentType: "application/json;charset=utf-8",
+            xhrFields: {
+                withCredentials: true
+            }, success: labelData
+        });
+        $.ajax({
+            type: "POST",
+            url: serviceURL + "/admin/updataEssay.do",
+            data: JSON.stringify({blogId: rows.blogId}),
+            dataType: "json",
+            contentType: "application/json;charset=utf-8",
+            xhrFields: {
+                withCredentials: true
+            }, success: essayView
+        });
+    });
+    //实例化编辑器
+    var ue = UE.getEditor('editor');
+
+
+    $('#content_UEditor').click(function () {
+        $.ajax({
+            type: "POST",
+            url: serviceURL + "/admin/updataEssayByBlogId.do",
+            data: JSON.stringify({
+                blogId:$('#numberId').val(),
+                title: $('#title').val(),
+                label: $('#label').find("option:selected").text(),
+                something: $('#something').val(),
+                content: ue.getContent()
+            }),
+            dataType: "json",
+            contentType: "application/json;charset=utf-8",
+            xhrFields:{
+                withCredentials:true
+            },success:sucessUpdateEssay
+        });
+
+    });
+</script>
+<body>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ss.www.mapper.RolePermissionMapper">
+	<select id="permissionTable" resultType="Role">
+		select * from role
+	</select>
+	<insert id="insertPermission" parameterType="Role">
+		insert into
+		role(role,create_Date) values(#{role},#{create_Date})
+	</insert>
+	<select id="findPermissionRole" parameterType="string"
+		resultType="Role">
+		select * from role where role=#{role}
+	</select>
+	<update id="updatePermission" parameterType="Role">
+		update role set
+		role=#{role} where role_id=#{role_Id}
+	</update>
+	<delete id="deletePermission" parameterType="int">
+		delete from role
+		where role_Id=#{role_Id}
+	</delete>
+	<select id="permissionAllot"  resultType="Permission">
+		SELECT * FROM permission 
+	</select>
+	<insert id="insertPermissionAllot" parameterType="java.util.List">
+	insert into role_permission (permission_id,role_id)
+	values
+	<foreach collection="list" item="items" index="index" separator=",">
+	(
+	#{items.permission_id},
+	#{items.role_id}
+	)
+	</foreach>
+	</insert>
+	<delete id="deletePermissionAllot" parameterType="string">
+	DELETE FROM role_permission where role_id=#{role_id}
+	</delete>
+</mapper>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ss.www.mapper.PermissionMapper">
+	<resultMap type="com.ss.www.entity.PermissionResultMap"
+		id="permissionResultMap">
+		<id column="user_id" property="user_Id" jdbcType="INTEGER" />
+		<result column="role_id" property="role_Id" jdbcType="INTEGER" />
+		<result column="permission_id" property="permission_Id" jdbcType="INTEGER" />
+		<result column="role" property="role" jdbcType="VARCHAR" />
+		<result column="resourse" property="resourse" jdbcType="VARCHAR" />
+	</resultMap>
+	<select id="findUserPermission" parameterType="int"
+		resultMap="permissionResultMap">
+		SELECT
+		e.user_id,b.role_id,c.permission_id,b.role,c.resourse FROM
+		role_permission a INNER JOIN role b ON a.role_id=b.role_id
+		INNER JOIN
+		permission c ON a.permission_id=c.permission_id
+		INNER JOIN role_user d
+		ON b.role_id=d.role_id
+		INNER JOIN user e ON d.user_id=e.user_id
+		where
+		e.user_id=#{user_id};
+	</select>
+</mapper>
